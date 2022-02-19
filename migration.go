@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -53,7 +54,7 @@ func Migrate(ctx context.Context, db *pgx.Conn) error {
 
 	//create orders table
 	_, err = tx.Exec(ctx, `
-		ccreate table if not exists orders (
+		create table if not exists orders (
 			id bigserial primary key,
 			user_id bigint not null,
 			product_id bigint not null,
@@ -81,10 +82,11 @@ func Migrate(ctx context.Context, db *pgx.Conn) error {
 	if err != nil {
 		if errRollback := tx.Rollback(ctx); errRollback != nil {
 			return errors.New("unable to rollback commit transaction: " + errRollback.Error())
-		}		
+		}
 		return errors.New("unable to commit transaction: " + err.Error())
 	}
 
 	msg := fmt.Sprintf("migration successful")
-	return errors.New(msg)
+	log.Println(msg)
+	return nil
 }

@@ -20,12 +20,12 @@ func init() {
 func main() {
 	app := fiber.New()
 
-	// ctx := context.Background()
+	ctx := context.Background()
 
 	db := os.Getenv("DB_URL")
-	conn, err := pgx.Connect(context.Background(), db)
+	conn, err := pgx.Connect(ctx, db)
 
-	err = Migrate(context.Background(), conn)
+	err = Migrate(ctx, conn)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	defer conn.Close(context.Background())
+	defer conn.Close(ctx)
 
 	// var name string
 
