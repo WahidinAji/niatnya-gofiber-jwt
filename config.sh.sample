@@ -1,3 +1,4 @@
 #!/bin/bash
 export DB_URL="postgres://username:password@localhost:5432/database"
+export TELEGRAM_APITOKEN="your_telegram_api_token"
 go run .

@@ -8,7 +8,9 @@
 
 ## Running
 ### On Linux 
-* bash config.sh
+```bash
+bash config.sh
+```
 
 ### on Windows
 * I'm Sorry, I forgot how to export environment on Windows :/
