@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"pgx-pgsql/api/orders"
 	"pgx-pgsql/api/products"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -57,7 +58,12 @@ func main() {
 	defer conn.Close(ctx)
 
 	product := products.ProductDeps{DB: conn}
+	order := orders.OrderDeps{DB: conn}
 	product.ProductRouter(app)
+	order.OrderRoutes(app)
+
+	api := app.Group("/api/v1")
+	api.Mount("/orders", orders.Handler(conn))
 
 	// #region
 	// var name string
