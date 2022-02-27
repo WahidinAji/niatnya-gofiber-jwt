@@ -7,10 +7,10 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-
 type Repository interface {
 	FindAll(ctx context.Context, db *pgx.Conn) ([]Order, error)
 	FindById(ctx context.Context, db *pgx.Conn, id int64) (Order, error)
+	RepoCreateOrder(ctx context.Context, order OrderRequest) (OrderRequest, error)
 }
 
 func FindAll(ctx context.Context, db *pgx.Conn) ([]Order, error) {
@@ -67,4 +67,30 @@ func (d *OrderDeps) FindById(ctx context.Context, id int64) (Order, error) {
 	}
 
 	return order, nil
+}
+
+func (d *OrderDeps) RepoCreateOrder(ctx context.Context, orderRequest OrderRequest) (OrderRequest, error) {
+
+	query := "insert into orders (user_id, product_id, quantity, total) values ($1, $2, $3, $4) returning id"
+
+	// var id int64
+	// row := d.DB.QueryRow(ctx, query, orderRequest.UserID, orderRequest.ProductID, orderRequest.Quantity, orderRequest.Total).Scan(&id)
+
+	_, err := d.DB.Exec(ctx, query, orderRequest.UserID, orderRequest.ProductID, orderRequest.Quantity, orderRequest.Total)
+	if err != nil {
+		return OrderRequest{}, errors.New("Unable to execute query : " + err.Error())
+	}
+
+	// fmt.Println("data :", row, "\no :", orderRequest, "\nid :", id)
+	// var order OrderResponse
+
+	// order = OrderResponse{
+	// 	ID:        id,
+	// 	UserID:    orderRequest.UserID,
+	// 	ProductID: orderRequest.ProductID,
+	// 	Quantity:  orderRequest.Quantity,
+	// 	Total:     orderRequest.Total,
+	// }
+
+	return orderRequest, nil
 }

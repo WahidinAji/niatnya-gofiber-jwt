@@ -8,7 +8,9 @@ import (
 	"os"
 	"pgx-pgsql/api/orders"
 	"pgx-pgsql/api/products"
+	"pgx-pgsql/api/users"
 
+	"github.com/go-playground/validator/v10"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -58,12 +60,12 @@ func main() {
 	defer conn.Close(ctx)
 
 	product := products.ProductDeps{DB: conn}
-	order := orders.OrderDeps{DB: conn}
 	product.ProductRouter(app)
-	order.OrderRoutes(app)
 
+	validate := validator.New()
 	api := app.Group("/api/v1")
-	api.Mount("/orders", orders.Handler(conn))
+	api.Mount("/orders", orders.Handler(conn, validate))
+	api.Mount("/users", users.Handler(conn, validate))
 
 	// #region
 	// var name string

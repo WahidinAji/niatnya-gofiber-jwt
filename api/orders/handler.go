@@ -1,14 +1,16 @@
 package orders
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v4"
 )
 
-func Handler(db *pgx.Conn) *fiber.App {
+func Handler(db *pgx.Conn, val *validator.Validate) *fiber.App {
 	app := fiber.New()
 	deps := &OrderDeps{
-		DB: db,
+		DB:        db,
+		Validator: val,
 	}
 
 	//app.GET == anonimous func that returns a func(ctx *fiber.Ctx) error or u can
@@ -27,5 +29,6 @@ func Handler(db *pgx.Conn) *fiber.App {
 	})
 
 	app.Get("/:id", deps.GetById)
+	app.Post("/", deps.CreateOrder)
 	return app
 }

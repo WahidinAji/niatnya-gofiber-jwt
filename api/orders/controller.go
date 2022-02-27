@@ -36,3 +36,24 @@ func (d *OrderDeps) GetById(ctx *fiber.Ctx) error {
 		"status": "success",
 	})
 }
+
+func (d *OrderDeps) CreateOrder(ctx *fiber.Ctx) error {
+	var order OrderRequest
+	if err := ctx.BodyParser(&order); err != nil {
+		return ctx.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	data, err := d.ServiceCreateOrder(ctx.Context(), order)
+	if err != nil {
+		return ctx.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+			"status":  "error",
+		})
+	}
+	return ctx.JSON(fiber.Map{
+		"data":   data,
+		"status": "success",
+	})
+}
