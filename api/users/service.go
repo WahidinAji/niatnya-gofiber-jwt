@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -68,6 +69,7 @@ func (d *UserDeps) LoginServiceUser(ctx context.Context, input LoginInput) (*Jwt
 
 	// errs := d.UValidate(LoginInput{Email: email, Password: password})
 	errs := d.UValidate(input)
+	fmt.Println(errs)
 	if errs != "" {
 		return nil, fiber.NewErrors(fiber.StatusBadRequest, errs)
 	}
@@ -77,16 +79,21 @@ func (d *UserDeps) LoginServiceUser(ctx context.Context, input LoginInput) (*Jwt
 		return nil, errors.New("Unable to begin transaction : " + err.Error())
 	}
 	defer tx.Rollback(ctx)
-	pass, err := HashPass(input.Password)
-	if err != nil {
-		return nil, err
+
+	var checkPass bool
+	pass, err := d.GetPassUser(ctx, input.Email)
+
+	checkPass = CheckPassword(input.Password, pass)
+	if !checkPass {
+		return nil, errors.New("Invalid email or password")
 	}
-	_, err = d.CheckRepoUser(ctx, input.Email, pass)
+
+	_, err = d.CheckRepoUser(ctx, input.Email, string(pass))
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := d.LoginUserRepo(ctx, input.Email, pass)
+	user, err := d.LoginUserRepo(ctx, input.Email, string(pass))
 	if err != nil {
 		return nil, err
 	}

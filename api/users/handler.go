@@ -12,6 +12,6 @@ func Handler(db *pgx.Conn, val *validator.Validate) *fiber.App {
 		DB:        db,
 		Validator: val,
 	}
-	app.Post("/", deps.LoginUser)
+	app.Post("/login", deps.LoginUser)
 	return app
 }

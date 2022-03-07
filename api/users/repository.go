@@ -17,6 +17,15 @@ func (d *UserDeps) CheckRepoUser(ctx context.Context, email, password string) (b
 	return true, nil
 }
 
+func (d *UserDeps) GetPassUser(ctx context.Context, email string) (string, error) {
+	var pass string
+	err := d.DB.QueryRow(ctx, "select password from users where email = $1", email).Scan(&pass)
+	if err != nil {
+		return "", errors.New("Unable to query database : " + err.Error())
+	}
+	return pass, nil
+}
+
 func (d *UserDeps) LoginUserRepo(ctx context.Context, email, password string) (*UserResponse, error) {
 	var user UserResponse
 	err := d.DB.QueryRow(ctx, "select name, email from users where email = $1 and password = $2", email, password).Scan(&user.Email, &user.Name)

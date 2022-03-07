@@ -1,6 +1,8 @@
 package orders
 
 import (
+	"pgx-pgsql/api/middleware"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v4"
@@ -28,7 +30,7 @@ func Handler(db *pgx.Conn, val *validator.Validate) *fiber.App {
 		})
 	})
 
-	app.Get("/:id", deps.GetById)
+	app.Get("/:id", middleware.Protected(), deps.GetById)
 	app.Post("/", deps.CreateOrder)
 	return app
 }
